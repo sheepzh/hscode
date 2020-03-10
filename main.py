@@ -4,7 +4,8 @@
     参数列表：
         --search 或 -s [搜索条件]       推荐使用商品编码前两位,即相应的商品分类,默认01－活动物
         --file-root [dir]             文件存储的位置，默认'~/hscode_file/'
-        --outdated                    是否包含已过期的数据
+        --outdated                    包含已过期的数据
+        --no-latest                   不生成/覆盖latest文件
     @author zhy
     @version 1.0
 """
@@ -33,18 +34,26 @@ def parse_argv():
     result = {
         'search': '01',
         'file_root': os.environ['HOME'] + '/hscode_file',
-        'outdated': False
+        'outdated': False,
+        'no_latest': False
     }
     # 第一个参数为hscode.py 直接从第二个开始进行解析
     for i in range(1, lenth):
         # print(argv[i])
         # 搜索条件参数
-        if argv[i] == '-s' or argv[i] == '--search'and lenth > i+1:
+        if argv[i] == '-s' or argv[i] == '--search' and lenth > i+1:
             i += 1
             result['search'] = argv[i]
+        # 文件根目录
+        elif argv[i] == '--file-root' and lenth > i+1:
+            i += 1
+            result['file_root'] = argv[i]
         # 是否包含已过期数据
         elif argv[i] == '--outdated':
             result['outdated'] = True
+        # 不生成/覆盖 latest 文件
+        elif argv[i] == '--no-latest':
+            result['no_latest'] = True
     return result
 
 
@@ -227,10 +236,14 @@ def main():
 
     curr_date = time.strftime('%Y%m%d_%H:%M', time.localtime())
     file_path = file_root + '/hscode_' + search + '_' + curr_date + '.txt'
+
+    no_latest = args.get("no_latest")
+
     file_latest = file_root + '/hscode_' + search + '_latest.txt'
 
     file1 = open(file_path, 'w')
-    file2 = open(file_latest, 'w')
+    if not no_latest:
+        file2 = open(file_latest, 'w')
 
     for code in all_code:
         # 解析海关编码
@@ -241,10 +254,12 @@ def main():
         #　写入文件
         file1.write(hs_record_str)
         file1.write('\n')
-        file2.write(hs_record_str)
-        file2.write('\n')
+        if not no_latest:
+            file2.write(hs_record_str)
+            file2.write('\n')
     file1.close()
-    file2.close()
+    if not no_latest:
+        file2.close()
 
     print('Items' + ('(including outdated)'if include_outdated else '') +
           ' num: ' + str(len(all_code)))
