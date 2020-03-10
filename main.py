@@ -226,8 +226,8 @@ def main():
         os.mkdir(file_root)
 
     curr_date = time.strftime('%Y%m%d_%H:%M', time.localtime())
-    file_path = file_root + '/hscode_' + curr_date + '.txt'
-    file_latest = file_root + '/hscode_latest.txt'
+    file_path = file_root + '/hscode_' + search + '_' + curr_date + '.txt'
+    file_latest = file_root + '/hscode_' + search + '_latest.txt'
 
     file1 = open(file_path, 'w')
     file2 = open(file_latest, 'w')
