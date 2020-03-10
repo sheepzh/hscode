@@ -261,7 +261,9 @@ def main():
     if not no_latest:
         file2.close()
 
-    print('Items' + ('(including outdated)'if include_outdated else '') +
+    print('Items (with searching "' + search + '"' +
+          (' including outdated'if include_outdated else '') +
+          ')' +
           ' num: ' + str(len(all_code)))
 
 
