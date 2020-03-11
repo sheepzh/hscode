@@ -34,15 +34,34 @@ class HsRecord():
         self.ciq_code = ciq
 
     def __str__(self):
-        name = self.name.replace('"', '\\"')
-
-        return '{ "code": ' + str(self.code) + ', "name": "' + name + '", "outdated": ' + \
-            ('true'if self.outdated else 'false') + ', "update_time": "' + self.update_time + \
-            '", "tax_info": ' + str(self.tax) + ', "declarations": ' + \
-            self.arr2json(self.declarations) + ', "supervisions": ' + \
-            self.arr2json(self.supervisions) + ', "quarantines": ' + \
-            self.arr2json(self.quarantines) + ', "ciq_codes": ' + \
-            self.arr2json(self.ciq_code) + ' }'
+        # 没有主键其他属性一律视为无效
+        if not self.code:
+            return '{}'
+        result = '{ "code": "' + self.code + '"'
+        if self.name:
+            # 名称可能存在双引号，json转义
+            name = str(self.name).replace('"', '\\"')
+            result += ', "name": "' + name + '"'
+        if self.outdated is not None:
+            boolean2str = 'true'if self.outdated else 'false'
+            result += ', "outdated": ' + boolean2str
+        if self.update_time:
+            result += ', "update_time": "' + self.update_time + '"'
+        if self.tax:
+            result += ', "tax_info": ' + str(self.tax)
+        if self.declarations:
+            arr_str = self.arr2json(self.declarations)
+            result += ', "declarations": ' + arr_str
+        if self.supervisions:
+            arr_str = self.arr2json(self.supervisions)
+            result += ', "supervisions": ' + arr_str
+        if self.quarantines:
+            arr_str = self.arr2json(self.quarantines)
+            result += ', "quarantines": ' + arr_str
+        if self.ciq_code:
+            arr_str = self.arr2json(self.ciq_code)
+            result += ', "ciq_codes": ' + arr_str
+        return result + ' }'
 
     def arr2json(self, arr):
         """
@@ -50,7 +69,11 @@ class HsRecord():
         """
         if len(arr) == 0:
             return "[]"
-        double_quote = list(map(lambda a: '"' + str(a) + '"', arr))
+        double_quote = list(
+            map(lambda a: '"' + str(a).replace('"', '\"').replace('\\', '\\\\') + '"',
+                arr
+                )
+        )
         linked = reduce(lambda a, b: str(a)+', '+str(b), double_quote)
         return '[' + linked + ']'
 
@@ -60,7 +83,7 @@ class BaseInfo():
         海关编码基本信息
     """
 
-    def __init__(self, code, name="", outdated=False, update_time=""):
+    def __init__(self, code, name=None, outdated=None, update_time=None):
         self.code = code
         self.name = name
         self.outdated = outdated

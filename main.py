@@ -2,14 +2,15 @@
     https://www.hsbianma.com/
     海关编码爬虫程序
     参数列表：
-        --search 或 -s [搜索条件]       推荐使用商品编码前两位,即相应的商品分类,默认01－活动物
-        --file-root [dir]             文件存储的位置，默认'~/hscode_file/'
-        --outdated                    包含已过期的数据
-        --no-latest                   不生成/覆盖latest文件
+        --help或-h：查看帮助信息
+        --search或-s [chapter]：爬取具体章节(商品编码前两位)的内容，默认01
+        --all或-a：爬取所有章节的内容。该开关开启时，-s 无效
+        --file-root [dir]: 设置保存文件的根路径，默认值[HOME]/hascode_file。\
+          文件命名hscode_[chapter]_YYYYMMDD_HH:mm.txt，以及hscode_[chapter]_latest.txt
+        --no-latest：不生成(或覆盖原有的)latest文件
     @author zhy
     @version 1.0
 """
-
 
 import json
 import os
@@ -27,7 +28,7 @@ BASE_URL = 'https://www.hsbianma.com'
 def parse_argv():
     """
       解析系统参数
-      python3 hscode.py -s 85
+      python hscode.py -s 85
     """
     argv = sys.argv
     lenth = len(argv)
@@ -35,11 +36,12 @@ def parse_argv():
         'search': '01',
         'file_root': os.environ['HOME'] + '/hscode_file',
         'outdated': False,
-        'no_latest': False
+        'no_latest': False,
+        'all': False,
+        'help': False
     }
     # 第一个参数为hscode.py 直接从第二个开始进行解析
     for i in range(1, lenth):
-        # print(argv[i])
         # 搜索条件参数
         if argv[i] == '-s' or argv[i] == '--search' and lenth > i+1:
             i += 1
@@ -54,6 +56,12 @@ def parse_argv():
         # 不生成/覆盖 latest 文件
         elif argv[i] == '--no-latest':
             result['no_latest'] = True
+        # 爬取所有章节
+        elif argv[i] == '--all' or argv[i] == '-a':
+            result['all'] = True
+        # 打印帮助信息
+        elif argv[i] == '--help' or argv[i] == '-h':
+            result['help'] = True
     return result
 
 
@@ -101,7 +109,7 @@ def parse_code_head_tr(tr_, outdated=False):
             return int(code)
         return 0
     else:
-        return int(code_txt)
+        return code_txt
 
 
 def query_page(search, page_index=1, outdated=False):
@@ -133,6 +141,10 @@ def find_details(code):
     html = url2html(url)
     soup = BeautifulSoup(html, 'lxml')
     # 资料div
+    wrap_div = soup.find(id='wrap')
+    if wrap_div is None:
+        none_base = BaseInfo(code)
+        return HsRecord(none_base, None, None, None, None, None)
     content = soup.find(id='wrap').contents[5].contents[1]
     details = content.find_all('div', class_='cbox')
     # 基本信息
@@ -212,34 +224,28 @@ def find_details(code):
     return HsRecord(base_info, tax_info, declarations, supervisions, quarantines, ciq_codes)
 
 
-def main():
+def get_search_of(search, include_outdated, file_root, no_latest):
     """
-        main函数
+        爬取指定章节的所有code
     """
-
-    args = parse_argv()
-    # print(args)
-    # 搜索条件
-    search = args.get('search')
-    include_outdated = args.get('outdated')
     # 最大页数
     page_num = all_page_num(search)
-
     all_code = []
     # 此处可以改用多线程
-    for page_index in range(1, page_num+1):
-        all_code.extend(query_page(search, page_index, include_outdated))
+    for page_index in range(page_num):
+        all_code.extend(query_page(search, page_index + 1, include_outdated))
 
-    file_root = args.get('file_root')
     if not os.path.exists(file_root):
         os.mkdir(file_root)
 
     curr_date = time.strftime('%Y%m%d_%H:%M', time.localtime())
-    file_path = file_root + '/hscode_' + search + '_' + curr_date + '.txt'
 
-    no_latest = args.get("no_latest")
+    outdated_str = "outdated_" if include_outdated else ''
 
-    file_latest = file_root + '/hscode_' + search + '_latest.txt'
+    file_path = file_root + '/hscode_' + \
+        outdated_str + search + '_' + curr_date + '.txt'
+
+    file_latest = file_root + '/hscode_' + outdated_str + search + '_latest.txt'
 
     file1 = open(file_path, 'w')
     if not no_latest:
@@ -250,6 +256,7 @@ def main():
         hs_record = find_details(code)
         hs_record_str = str(hs_record)
         # 检验是否合法json
+        print(hs_record_str)
         json.loads(hs_record_str)
         #　写入文件
         file1.write(hs_record_str)
@@ -265,6 +272,45 @@ def main():
           (' including outdated'if include_outdated else '') +
           ')' +
           ' num: ' + str(len(all_code)))
+
+
+def main():
+    """
+        main函数
+    """
+
+    args = parse_argv()
+
+    if args.get('help'):
+        print('参数列表：')
+        print('  --help|-h                       查看帮助信息')
+        print('  --search|-s [chapter]           爬取具体章节(商品编码前两位)的内容，默认01')
+        print('  --all|-a                        爬取所有章节的内容。该开关开启时，--search 无效')
+        print(
+            '  --file-root [dir]               设置保存文件的根路径，默认值[HOME]/hascode_file')
+        print(
+            '                                  文件命名格式hscode_[chapter]_YYYYMMDD_HH:mm.txt，以及hscode_[chapter]_latest.txt')
+        print('  --no-latest                     不生成(或覆盖原有的)latest文件')
+        return
+    # print(args)
+    # 搜索条件
+    search = args.get('search')
+    include_outdated = args.get('outdated')
+    file_root = args.get('file_root')
+    # 是否爬取所有页面
+    all_search = args.get('all')
+    no_latest = args.get('no_latest')
+
+    if all_search:
+        # 01-09
+        for i in range(9):
+            chapter = '0' + str(i+1)
+            get_search_of(chapter, include_outdated, file_root, no_latest)
+        # 10-99
+        for i in range(10, 100):
+            get_search_of(str(i), include_outdated, file_root, no_latest)
+    else:
+        get_search_of(str(search), include_outdated, file_root, no_latest)
 
 
 main()
