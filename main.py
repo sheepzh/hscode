@@ -238,6 +238,10 @@ def get_search_of(search, include_outdated, file_root, no_latest):
     if not os.path.exists(file_root):
         os.mkdir(file_root)
 
+    latest_root = file_root + '/latest'
+    if not os.path.exists(latest_root):
+        os.mkdir(latest_root)
+
     curr_date = time.strftime('%Y%m%d_%H:%M', time.localtime())
 
     outdated_str = "outdated_" if include_outdated else ''
@@ -245,7 +249,7 @@ def get_search_of(search, include_outdated, file_root, no_latest):
     file_path = file_root + '/hscode_' + \
         outdated_str + search + '_' + curr_date + '.txt'
 
-    file_latest = file_root + '/hscode_' + outdated_str + search + '_latest.txt'
+    file_latest = latest_root + '/hscode_' + outdated_str + search + '.txt'
 
     file1 = open(file_path, 'w')
     if not no_latest:
