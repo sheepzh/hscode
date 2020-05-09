@@ -225,7 +225,7 @@ def find_details(code):
         tds = ciq_tr.find_all('td')
         if len(tds) == 2:
             ciq_code = tds[0].text
-            ciq_name = tds[1].text.replace('\r', '').replace('\n', '').replace(' ', '')
+            ciq_name = tds[1].text.replace('\r', '').replace('\n', '').replace(' ', '').replace('"', '\"').replace("'", '\'')
             ciq_codes[ciq_code] = ciq_name
     # print(ciq_codes)
     return HsRecord(base_info, tax_info, declarations, supervisions, quarantines, ciq_codes)
