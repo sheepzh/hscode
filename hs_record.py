@@ -37,7 +37,7 @@ class HsRecord():
         # 没有主键其他属性一律视为无效
         if not self.code:
             return '{}'
-        result = '{ "code": "' + self.code + '"'
+        result = '{ "code": "' + str(self.code) + '"'
         if self.name:
             # 名称可能存在双引号，json转义
             name = str(self.name).replace('"', '\\"')

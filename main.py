@@ -40,7 +40,7 @@ def parse_argv():
         'all': False,
         'help': False
     }
-    # 第一个参数为hscode.py 直接从第二个开始进行解析
+    # 第一个参数为 main.py 直接从第二个开始进行解析
     for i in range(1, lenth):
         # 搜索条件参数
         if argv[i] == '-s' or argv[i] == '--search' and lenth > i+1:
@@ -106,7 +106,7 @@ def parse_code_head_tr(tr_, outdated=False):
     if '[过期]' in code_txt:
         if outdated:
             code = code_txt[0:-4]
-            return int(code)
+            return code
         return 0
     else:
         return code_txt
@@ -128,7 +128,7 @@ def query_page(search, page_index=1, outdated=False):
     result = []
     for tr_ in all_record_tr:
         code = parse_code_head_tr(tr_, outdated)
-        if code != 0:
+        if code != '0':
             result.append(code)
     return result
 
@@ -244,7 +244,7 @@ def get_search_of(search, include_outdated, file_root, no_latest):
 
     curr_date = time.strftime('%Y%m%d_%H:%M', time.localtime())
 
-    outdated_str = "outdated_" if include_outdated else ''
+    outdated_str = "including_outdated_" if include_outdated else ''
 
     file_path = file_root + '/hscode_' + \
         outdated_str + search + '_' + curr_date + '.txt'
@@ -272,7 +272,7 @@ def get_search_of(search, include_outdated, file_root, no_latest):
     if not no_latest:
         file2.close()
 
-    print('Items (with searching "' + search + '"' +
+    print('Item (with searching "' + search + '"' +
           (' including outdated'if include_outdated else '') +
           ')' +
           ' num: ' + str(len(all_code)))
@@ -290,11 +290,10 @@ def main():
         print('  --help|-h                       查看帮助信息')
         print('  --search|-s [chapter]           爬取具体章节(商品编码前两位)的内容，默认01')
         print('  --all|-a                        爬取所有章节的内容。该开关开启时，--search 无效')
-        print(
-            '  --file-root [dir]               设置保存文件的根路径，默认值[HOME]/hascode_file')
-        print(
-            '                                  文件命名格式hscode_[chapter]_YYYYMMDD_HH:mm.txt，以及hscode_[chapter]_latest.txt')
+        print('  --file-root [dir]               设置保存文件的根路径，默认值[HOME]/hascode_file')
+        print('                                  文件命名格式hscode_[chapter]_YYYYMMDD_HH:mm.txt，以及hscode_[chapter]_latest.txt')
         print('  --no-latest                     不生成(或覆盖原有的)latest文件')
+        print('  --outdated                      包含[过期]数据')
         return
     # print(args)
     # 搜索条件

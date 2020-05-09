@@ -29,6 +29,7 @@ python main.py [options]
 + -a或--all：爬取所有章节的内容。该开关开启时，-s 无效
 + --file-root \[dir\]: 设置保存文件的根路径，默认值\[HOME]/hascode_file。文件命名hscode_\[chapter]\_YYYYMMDD_HH:mm.txt，以及hscode_\[chapter]_latest.txt+
 + --no-latest：不生成(或覆盖原有的)latest文件
++ --outdated: 爬取过期数据
 
 ### 数据格式
 
