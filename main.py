@@ -8,6 +8,7 @@
         --file-root [dir]: 设置保存文件的根路径，默认值[HOME]/hascode_file。\
           文件命名hscode_[chapter]_YYYYMMDD_HH:mm.txt，以及hscode_[chapter]_latest.txt
         --no-latest：不生成(或覆盖原有的)latest文件
+        --quiet或-q：静默模式，不打印海关编码信息
     @author zhy
     @version 1.0
 """
@@ -38,7 +39,8 @@ def parse_argv():
         'outdated': False,
         'no_latest': False,
         'all': False,
-        'help': False
+        'help': False,
+        'quiet': False
     }
     # 第一个参数为 main.py 直接从第二个开始进行解析
     for i in range(1, lenth):
@@ -62,6 +64,8 @@ def parse_argv():
         # 打印帮助信息
         elif argv[i] == '--help' or argv[i] == '-h':
             result['help'] = True
+        elif argv[i] == '--quiet' or argv[i] == '-q':
+            result['quiet'] = True
     return result
 
 
@@ -107,7 +111,7 @@ def parse_code_head_tr(tr_, outdated=False):
         if outdated:
             code = code_txt[0:-4]
             return code
-        return 0
+        return '0'
     else:
         return code_txt
 
@@ -150,7 +154,7 @@ def find_details(code):
     # 基本信息
     base_info_tab_txts = details[0].table.tbody.find_all('td', class_='td-txt')
     base_info = BaseInfo(code)
-    base_info.name = base_info_tab_txts[1].text
+    base_info.name = base_info_tab_txts[1].text.replace('\n', '').replace('\r', '').replace(' ', '')
     base_info.outdated = base_info_tab_txts[2].text == '过期'
     base_info.update_time = base_info_tab_txts[3].text
     # print(base_info)
@@ -213,18 +217,21 @@ def find_details(code):
             quarantines.append(txt)
     # print(quarantines)
 
+
     # ciq编码
-    ciq_code_txts = details[6].table.tbody.find_all('td', class_='td-label')
-    ciq_codes = []
-    for ciq_code in ciq_code_txts:
-        txt = ciq_code.text
-        if txt != '无'and txt != '':
-            ciq_codes.append(txt)
+    ciq_codes = {}
+    ciq_trs = details[6].table.tbody.find_all('tr')
+    for ciq_tr in ciq_trs:
+        tds = ciq_tr.find_all('td')
+        if len(tds) == 2:
+            ciq_code = tds[0].text
+            ciq_name = tds[1].text.replace('\r', '').replace('\n', '').replace(' ', '')
+            ciq_codes[ciq_code] = ciq_name
     # print(ciq_codes)
     return HsRecord(base_info, tax_info, declarations, supervisions, quarantines, ciq_codes)
 
 
-def get_search_of(search, include_outdated, file_root, no_latest):
+def get_search_of(search, include_outdated, file_root, no_latest, quiet=False):
     """
         爬取指定章节的所有code
     """
@@ -260,7 +267,8 @@ def get_search_of(search, include_outdated, file_root, no_latest):
         hs_record = find_details(code)
         hs_record_str = str(hs_record)
         # 检验是否合法json
-        print(hs_record_str)
+        if not quiet:
+            print(hs_record_str)
         json.loads(hs_record_str)
         #　写入文件
         file1.write(hs_record_str)
@@ -303,15 +311,16 @@ def main():
     # 是否爬取所有页面
     all_search = args.get('all')
     no_latest = args.get('no_latest')
+    quiet = args.get('quiet')
 
     if all_search:
         # 01-09
         for i in range(9):
             chapter = '0' + str(i+1)
-            get_search_of(chapter, include_outdated, file_root, no_latest)
+            get_search_of(chapter, include_outdated, file_root, no_latest, quiet)
         # 10-99
         for i in range(10, 100):
-            get_search_of(str(i), include_outdated, file_root, no_latest)
+            get_search_of(str(i), include_outdated, file_root, no_latest, quiet)
     else:
         get_search_of(str(search), include_outdated, file_root, no_latest)
 
