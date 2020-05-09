@@ -10,7 +10,7 @@ class HsRecord():
         海关编码记录
     """
 
-    def __init__(self, base_info, tax, declarations, supervisions, quarantines,  ciq):
+    def __init__(self, base_info, tax, declarations, supervisions, quarantines, ciq):
         """
             构造函数
         """
@@ -59,7 +59,7 @@ class HsRecord():
             arr_str = self.arr2json(self.quarantines)
             result += ', "quarantines": ' + arr_str
         if self.ciq_code:
-            arr_str = self.arr2json(self.ciq_code)
+            arr_str = self.dict2json(self.ciq_code)
             result += ', "ciq_codes": ' + arr_str
         return result + ' }'
 
@@ -77,6 +77,17 @@ class HsRecord():
         linked = reduce(lambda a, b: str(a)+', '+str(b), double_quote)
         return '[' + linked + ']'
 
+    def dict2json(self, dictionary):
+        """
+            字典转json
+        """
+        content = ''
+        for key in dictionary:
+            if content is not '':
+                content = content+','
+            content = content+'"'+key+'": "'
+            content = content+dictionary.get(key).replace('"', '\"').replace('\\', '\\\\')+'"'
+        return "{" + content + "}"
 
 class BaseInfo():
     """
