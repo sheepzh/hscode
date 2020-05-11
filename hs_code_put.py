@@ -6,6 +6,10 @@
 import os
 import json
 import requests
+from concurrent.futures import ThreadPoolExecutor
+
+# 线程池
+EXCETOR = ThreadPoolExecutor(30)
 
 HS_CODE_LATEST_DIR = os.environ['HOME'] + '/hscode_file/latest'
 # API 网关地址
@@ -33,6 +37,40 @@ def read_tax_info(tax_info, field):
         val = val[0:-1]
     return val
 
+def send(line):
+    """
+        发送 code 信息
+    """
+    obj = json.loads(line)
+    tax_info = obj['tax_info']
+    data = {
+        'name': obj.get('name', ''),
+        'code': obj['code'],
+        'outdated': obj['outdated'],
+        'unit': read_tax_info(tax_info, 'unit'),
+        'export_rate': read_tax_info(tax_info, 'export'),
+        'export_rebate': read_tax_info(tax_info, 'ex_rebate'),
+        'export_provisional': read_tax_info(tax_info, 'ex_provisional'),
+        'vat': read_tax_info(tax_info, 'vat'),
+        'import_preferential': read_tax_info(tax_info, 'im_provisional'),
+        'import_provisional': read_tax_info(tax_info, 'provisional'),
+        'import_rate': read_tax_info(tax_info, 'import'),
+        'consumption': read_tax_info(tax_info, 'consumption'),
+        'declarations': obj.get('declarations', []),
+        'supervisions': obj.get('supervisions', []),
+        'quarantines': obj.get('quarantines', []),
+        'ciq_codes': obj.get('ciq_codes', [])
+        }
+    # print(str(data))
+    response = requests.put(API_URL, data=json.dumps(data), headers={'Content-Type':'application/json'})
+    if response.status_code is not 200:
+        print("------------------"+str(response.status_code))
+        print(data)
+    else :
+        cont = json.loads(response.content)
+        if 'code' not in cont or cont.get('code') is not 0:
+            print(str(cont))
+
 def read_and_send(file_name):
     """
         读取文件
@@ -42,29 +80,8 @@ def read_and_send(file_name):
         print('warning: file [' + file_path + '] not exists')
     with open(file_path, 'r') as file:
         for line in file.readlines():
-            obj = json.loads(line)
-            tax_info = obj['tax_info']
-            data = {
-                'name': obj.get('name', ''),
-                'code': obj['code'],
-                'outdated': obj['outdated'],
-                'unit': read_tax_info(tax_info, 'unit'),
-                'export_rate': read_tax_info(tax_info, 'export'),
-                'export_rebate': read_tax_info(tax_info, 'ex_rebate'),
-                'export_provisional': read_tax_info(tax_info, 'ex_provisional'),
-                'vat': read_tax_info(tax_info, 'vat'),
-                'import_preferential': read_tax_info(tax_info, 'im_provisional'),
-                'import_provisional': read_tax_info(tax_info, 'provisional'),
-                'import_rate': read_tax_info(tax_info, 'import'),
-                'consumption': read_tax_info(tax_info, 'consumption'),
-                'declarations': obj.get('declarations', []),
-                'supervisions': obj.get('supervisions', []),
-                'quarantines': obj.get('quarantines', []),
-                'ciq_codes': obj.get('ciq_codes', [])
-                }
-            print(str(data))
-            requests.put(API_URL, data=json.dumps(data), headers={'Content-Type':'application/json'})
-
+            EXCETOR.submit(send, line)
+        
 
 def main():
     """
