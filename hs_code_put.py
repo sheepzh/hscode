@@ -35,6 +35,14 @@ def read_tax_info(tax_info, field):
     val = val.replace(' ', '')
     if '%' in val:
         val = val[0:-1]
+    # 税率不止一个时返回 None，不存入数据库。e.g. 4412991010 退税税率
+    if '/' in val:
+        return ""
+    # 不是数字时，返回 None
+    try:
+        float(val)
+    except ValueError:
+        return ""
     return val
 
 def send(line):
@@ -47,7 +55,7 @@ def send(line):
         'name': obj.get('name', ''),
         'code': obj['code'],
         'outdated': obj['outdated'],
-        'unit': read_tax_info(tax_info, 'unit'),
+        'unit': tax_info.get('unit', ''),
         'export_rate': read_tax_info(tax_info, 'export'),
         'export_rebate': read_tax_info(tax_info, 'ex_rebate'),
         'export_provisional': read_tax_info(tax_info, 'ex_provisional'),
@@ -59,17 +67,19 @@ def send(line):
         'declarations': obj.get('declarations', []),
         'supervisions': obj.get('supervisions', []),
         'quarantines': obj.get('quarantines', []),
-        'ciq_codes': obj.get('ciq_codes', [])
+        'ciq_codes': obj.get('ciq_codes', {})
         }
     # print(str(data))
-    response = requests.put(API_URL, data=json.dumps(data), headers={'Content-Type':'application/json'})
+    headers = {'Content-Type':'application/json'}
+    response = requests.put(API_URL, data=json.dumps(data), headers=headers)
     if response.status_code is not 200:
         print("------------------"+str(response.status_code))
         print(data)
-    else :
+    else:
         cont = json.loads(response.content)
         if 'code' not in cont or cont.get('code') is not 0:
             print(str(cont))
+            print(data)
 
 def read_and_send(file_name):
     """
