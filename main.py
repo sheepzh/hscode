@@ -35,7 +35,7 @@ def parse_argv():
     lenth = len(argv)
     result = {
         'search': '01',
-        'file_root': os.environ['HOME'] + '/hscode_file',
+        'file_root': os.path.join(os.environ['HOME'], 'hscode_file'),
         'outdated': False,
         'no_latest': False,
         'all': False,
@@ -77,23 +77,6 @@ def url2html(url=''):
     html = requests.get(url_link)
     html.encoding = 'utf-8'
     return html.text
-
-
-def all_page_num(search):
-    """
-        search: 搜索条件
-        查询指定搜索条件的最大页数
-        返回int，如果没有则返回0
-    """
-    url = '/Search/999999?keywords=' + str(search)
-    soup = BeautifulSoup(url2html(url), features='lxml')
-    page_nav_div = soup.find(id='pagination')
-    if page_nav_div is None:
-        return 0
-    page_span = page_nav_div.span
-    if page_span is None:
-        return 0
-    return int(page_span.text)
 
 
 def parse_code_head_tr(tr_, outdated=False):
@@ -154,7 +137,8 @@ def find_details(code):
     # 基本信息
     base_info_tab_txts = details[0].table.tbody.find_all('td', class_='td-txt')
     base_info = BaseInfo(code)
-    base_info.name = base_info_tab_txts[1].text.replace('\n', '').replace('\r', '').replace(' ', '')
+    base_info.name = base_info_tab_txts[1].text.replace(
+        '\n', '').replace('\r', '').replace(' ', '')
     base_info.outdated = base_info_tab_txts[2].text == '过期'
     base_info.update_time = base_info_tab_txts[3].text
     # print(base_info)
@@ -217,7 +201,6 @@ def find_details(code):
             quarantines.append(txt)
     # print(quarantines)
 
-
     # ciq编码
     ciq_codes = {}
     ciq_trs = details[6].table.tbody.find_all('tr')
@@ -225,7 +208,8 @@ def find_details(code):
         tds = ciq_tr.find_all('td')
         if len(tds) == 2:
             ciq_code = tds[0].text
-            ciq_name = tds[1].text.replace('\r', '').replace('\n', '').replace(' ', '').replace('"', '').replace("'", '')
+            ciq_name = tds[1].text.replace('\r', '').replace(
+                '\n', '').replace(' ', '').replace('"', '').replace("'", '')
             ciq_codes[ciq_code] = ciq_name
     # print(ciq_codes)
     return HsRecord(base_info, tax_info, declarations, supervisions, quarantines, ciq_codes)
@@ -235,12 +219,13 @@ def get_search_of(search, include_outdated, file_root, no_latest, quiet=False):
     """
         爬取指定章节的所有code
     """
-    # 最大页数
-    page_num = all_page_num(search)
     all_code = []
-    # 此处可以改用多线程
-    for page_index in range(page_num):
-        all_code.extend(query_page(search, page_index + 1, include_outdated))
+    page_num = 1
+    while True:
+        list_per_page = query_page(search, page_num, include_outdated)
+        if len(list_per_page) == 0: break
+        all_code.extend(list_per_page)
+        page_num = page_num + 1
 
     if not os.path.exists(file_root):
         os.mkdir(file_root)
