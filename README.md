@@ -9,18 +9,20 @@ https://hsbianma.com
 
 ### 二、使用说明
 
-+ 确认已安装Python3环境、以及pip
++ 确认已安装Python3环境、以及pip3
 + 依赖库安装：
   + BeautifulSoup4
   + lxml
+  + requests
 
 ```shell
-pip install BeautifulSoup4
-pip install lxml
+pip3 install BeautifulSoup4
+pip3 install lxml
+pip3 install requests
 ```
 + 运行脚本
 ```shell
-python main.py [options]
+python3 main.py [options]
 ```
 参数列表:
 
