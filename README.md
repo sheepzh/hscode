@@ -1,14 +1,5 @@
 # 海关编码查询
 
-```
- __    __       _______.  ______   ______    _______   _______ 
-|  |  |  |     /       | /      | /  __  \  |       \ |   ____|
-|  |__|  |    |   (----`|  ,----'|  |  |  | |  .--.  ||  |__   
-|   __   |     \   \    |  |     |  |  |  | |  |  |  ||   __|  
-|  |  |  | .----)   |   |  `----.|  `--'  | |  '--'  ||  |____ 
-|__|  |__| |_______/     \______| \______/  |_______/ |_______|
-
-```
 [![](https://img.shields.io/github/license/sheepzh/hscode)](https://github.com/sheepzh/hscode/blob/main/LICENSE)
 [![](https://img.shields.io/github/v/release/sheepzh/hscode)](https://github.com/sheepzh/hscode/releases)
 
