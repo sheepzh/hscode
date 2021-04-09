@@ -1,5 +1,6 @@
 # 海关编码查询
 
+[![codecov](https://codecov.io/gh/sheepzh/hscode/branch/master/graph/badge.svg?token=5DX131J0LI)](https://codecov.io/gh/sheepzh/hscode)
 [![](https://img.shields.io/github/license/sheepzh/hscode)](https://github.com/sheepzh/hscode/blob/main/LICENSE)
 [![](https://img.shields.io/github/v/release/sheepzh/hscode)](https://github.com/sheepzh/hscode/releases)
 
