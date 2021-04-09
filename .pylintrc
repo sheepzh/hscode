@@ -1,0 +1,10 @@
+[MESSAGES CONTROL]
+disable=
+  import-error,
+  wrong-import-position,
+  too-many-arguments
+
+[DESIGN]
+max-attributes=12
+min-public-methods=0
+max-line-length=200

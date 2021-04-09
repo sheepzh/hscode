@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
     @author zhy
     @since 1.0
@@ -5,9 +6,35 @@
 from functools import reduce
 
 
-class HsRecord():
+def arr2json(arr):
     """
-        海关编码记录
+        数组转换成json
+    """
+    if len(arr) == 0:
+        return "[]"
+    double_quote = list(
+        map(lambda a: '"' + str(a).replace('"', '\"').replace('\\', '\\\\') + '"', arr)
+    )
+    linked = reduce(lambda a, b: str(a) + ', ' + str(b), double_quote)
+    return '[' + linked + ']'
+
+
+def dict2json(dictionary):
+    """
+        字典转json
+    """
+    content = ''
+    for key in dictionary:
+        if content:
+            content = content + ','
+        content = content + '"' + key + '": "'
+        content = content + dictionary.get(key).replace('"', '\"').replace('\\', '\\\\') + '"'
+    return "{" + content + "}"
+
+
+class Hscode():
+    """
+        海关编码
     """
 
     def __init__(self, base_info, tax, declarations, supervisions, quarantines, ciq):
@@ -50,44 +77,19 @@ class HsRecord():
         if self.tax:
             result += ', "tax_info": ' + str(self.tax)
         if self.declarations:
-            arr_str = self.arr2json(self.declarations)
+            arr_str = arr2json(self.declarations)
             result += ', "declarations": ' + arr_str
         if self.supervisions:
-            arr_str = self.arr2json(self.supervisions)
+            arr_str = arr2json(self.supervisions)
             result += ', "supervisions": ' + arr_str
         if self.quarantines:
-            arr_str = self.arr2json(self.quarantines)
+            arr_str = arr2json(self.quarantines)
             result += ', "quarantines": ' + arr_str
         if self.ciq_code:
-            arr_str = self.dict2json(self.ciq_code)
+            arr_str = dict2json(self.ciq_code)
             result += ', "ciq_codes": ' + arr_str
         return result + ' }'
 
-    def arr2json(self, arr):
-        """
-            数组转换成json
-        """
-        if len(arr) == 0:
-            return "[]"
-        double_quote = list(
-            map(lambda a: '"' + str(a).replace('"', '\"').replace('\\', '\\\\') + '"',
-                arr
-                )
-        )
-        linked = reduce(lambda a, b: str(a)+', '+str(b), double_quote)
-        return '[' + linked + ']'
-
-    def dict2json(self, dictionary):
-        """
-            字典转json
-        """
-        content = ''
-        for key in dictionary:
-            if content is not '':
-                content = content+','
-            content = content+'"'+key+'": "'
-            content = content+dictionary.get(key).replace('"', '\"').replace('\\', '\\\\')+'"'
-        return "{" + content + "}"
 
 class BaseInfo():
     """

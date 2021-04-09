@@ -1,15 +1,25 @@
-# 海关编码爬虫
+# 海关编码查询
 
-### 一、介绍
+```
+ __    __       _______.  ______   ______    _______   _______ 
+|  |  |  |     /       | /      | /  __  \  |       \ |   ____|
+|  |__|  |    |   (----`|  ,----'|  |  |  | |  .--.  ||  |__   
+|   __   |     \   \    |  |     |  |  |  | |  |  |  ||   __|  
+|  |  |  | .----)   |   |  `----.|  `--'  | |  '--'  ||  |____ 
+|__|  |__| |_______/     \______| \______/  |_______/ |_______|
 
-海关编码爬虫脚本。有其他需求，建议或者意见，请提 ISSUE。
+```
+[![](https://img.shields.io/github/license/sheepzh/hscode)](https://github.com/sheepzh/hscode/blob/main/LICENSE)
+[![](https://img.shields.io/github/v/release/sheepzh/hscode)](https://github.com/sheepzh/hscode/releases)
+
+海关编码查询。有其他需求，建议或者意见，请提 ISSUE。
 
 https://hsbianma.com
 
 
-### 二、使用说明
+### 二、爬虫脚本使用说明
 
-+ 确认已安装Python3环境、以及pip3
++ 确认已安装Python3环境、以及pip3。暂不打算支持 Python2
 + 依赖库安装：
   + BeautifulSoup4
   + lxml
@@ -33,6 +43,7 @@ python3 main.py [options]
 + --no-latest：不生成(或覆盖原有的)latest文件
 + --outdated: 爬取过期数据
 + --quiet或-q: 不打印海关编码信息
++ --proxy或-p [proxy-url]：设置请求代理
 
 ### 数据格式
 
@@ -77,3 +88,7 @@ python3 main.py [options]
     }
 }
 ```
+
+### TODO
+
++ 发布到 PyPi
