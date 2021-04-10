@@ -2,15 +2,27 @@
 language: python
 dist: xenial
 python:
+  - 3.5
   - 3.6
   - 3.7
 sudo: true
 install:
   - pip install coverage
 script:
-  - coverage run --source=hscode/. -m unittest hscode  tests/*.py
+  - coverage run --source=hscode/. -m unittest hscode tests/*.py
 after_success:
-  - coverage -t %CODECOV_TOKEN
+  - coverage -t $CODECOV_TOKEN
 branches:
   only:
     - main
+deploy:
+  provider: pypi
+  username: "__token__"
+  password: $PYPI_TOKEN
+  on:
+    python:
+      - 3.5
+      - 3.6
+      - 3.7
+    tags: true
+    branch: main

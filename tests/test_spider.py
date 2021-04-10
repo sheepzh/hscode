@@ -26,6 +26,9 @@ class TestSpider(TestCase):
         self.assertTrue(len(hscode.declarations) > 0)
         self.assertTrue(len(hscode.ciq_code.keys()) > 0)
 
+        hscode = spider.parse_details('110')
+        self.assertIsNone(hscode)
+
     def test_proxy(self):
         """
             Test proxy

@@ -17,9 +17,11 @@ def url2html(url, proxy):
     url_link = BASE_URL + url
     if proxy:
         url_link = proxy.replace('{url}', url_link)
-    html = requests.get(url_link, timeout=1)
-    html.encoding = 'utf-8'
-    content = html.text
+    response = requests.get(url_link, timeout=1)
+    if response.status_code == 404:
+        return ''
+    response.encoding = 'utf-8'
+    content = response.text
     if not content:
         content = ''
     return str(content)
@@ -52,7 +54,11 @@ def query_hscodes_by_page(chapter, page_index=1, outdated=False, proxy=None):
         返回所有的商品编码集合
     """
     url = '/Search/' + str(page_index) + '?keywords=' + str(chapter)
-    soup = BeautifulSoup(url2html(url, proxy), features='lxml')
+    content = url2html(url, proxy)
+    if not content:
+        # no response content or 404
+        return []
+    soup = BeautifulSoup(content, features='lxml')
     all_record_tr = soup.find_all('tr', class_='result-grid')
     if all_record_tr is None:
         return []
@@ -167,6 +173,8 @@ def parse_details(code, proxy=None):
         查询海关编码明细
     """
     html = url2html('/Code/' + str(code) + '.html', proxy)
+    if not html:
+        return None
     soup = BeautifulSoup(html, 'lxml')
     # 资料div
     wrap_div = soup.find(id='wrap')
@@ -184,7 +192,7 @@ def parse_details(code, proxy=None):
     return Hscode(base_info, tax_info, declarations, supervisions, quarantines, ciq_codes)
 
 
-def search_chapter(chapter, include_outdated, quiet, proxy):
+def search_chapter(chapter, include_outdated=False, quiet=False, proxy=None):
     """
         Search the chapter
     """
