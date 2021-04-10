@@ -92,20 +92,20 @@ python3 main.py --help
 
 ```txt
 参数列表：
-  --help|-h                     查看帮助信息
+  --help|-h                                 查看帮助信息
   --search|-s [chapter]         爬取具体章节(商品编码前两位)的内容，默认01
-  --all|-a                      爬取所有章节的内容。该开关开启时，--search 无效
-  --file-root [dir]             保存文件的根路径
-                                默认值[HOME]/hascode_file
-                                文件名格式: 
-                                 hscode_[chapter]_YYYYMMDD_HH:mm.txt
-                                 hscode_[chapter]_latest.txt
-  --no-latest                   不生成(或覆盖原有的)latest文件
-  --quiet|-q                    静默模式，不打印日志信息
-  --outdated                    包含[过期]数据
-  --proxy|-p [proxy-url]        请求代理
-                                 --proxy https://www.baidu.com?s={url}
-                                {url} 是原始请求 url
+  --all|-a                                     爬取所有章节的内容。该开关开启时，--search 无效
+  --file-root [dir]                     保存文件的根路径
+                                                     默认值[HOME]/hascode_file
+                                                     文件名格式: 
+                                                       hscode_[chapter]_YYYYMMDD_HH:mm.txt
+                                                       hscode_[chapter]_latest.txt
+  --no-latest                            不生成(或覆盖原有的)latest文件
+  --quiet|-q                              静默模式，不打印日志信息
+  --outdated                           包含[过期]数据
+  --proxy|-p [proxy-url]      使用代理
+                                                       --proxy https://www.baidu.com?s={url}
+                                                    {url} 是原始请求 url
 ```
 
 3. 示例：爬取 [第 97 章](https://hsbianma.com/search?keywords=97) 的海关编码
