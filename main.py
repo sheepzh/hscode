@@ -13,47 +13,7 @@
     @author zhy
     @version 1.2
 """
-import sys
-from hscode import argument
-from hscode.spider import search_chapter
-from hscode.writter import write
 
-
-def search_and_save(chapter, args):
-    """
-        Search and save
-    """
-    include_outdated = args.outdated
-    quiet = args.quiet_mode
-    proxy = args.url_proxy
-    hscodes = search_chapter(chapter, include_outdated, quiet, proxy)
-    write(args.file_root, chapter, hscodes, not args.no_latest)
-
-
-def main():
-    """
-        Entrance
-    """
-    args = argument.parse_argv(sys.argv)
-
-    if args.print_help:
-        argument.print_help()
-        return
-    # 搜索条件
-    chapter = args.chapter
-    # 是否爬取所有页面
-    all_search = args.all_chapters
-
-    if all_search:
-        # 01-09
-        for i in range(1, 10):
-            chapter = '0' + str(i)
-            search_and_save(chapter, args)
-        # 10-99
-        for i in range(10, 100):
-            search_and_save(str(i), args)
-    else:
-        search_and_save(str(chapter), args)
-
+from cmd import main
 
 main()

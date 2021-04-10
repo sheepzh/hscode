@@ -6,13 +6,13 @@
 from setuptools import setup
 
 setup(
-    name='code',
-    version='1.2.1',
+    name='hscode',
+    version='1.3.0',
     author='zhy',
     author_email='returnzhy1996@outlook.com',
     url='https://github.com/sheepzh/hscode',
     description=u'海关编码查询库',
-    packages=['hscode'],
+    packages=['hscode', 'bin'],
     keywords=['hscode', 'python3', 'ciq'],
     license='MIT',
     install_requires=[
@@ -22,7 +22,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'hscode=main:main'
+            'hscode=bin.command:main'
         ]
     },
     zip_safe=True
