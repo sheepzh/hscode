@@ -37,6 +37,7 @@ def print_help():
     print('                                 hscode_[chapter]_YYYYMMDD_HH:mm.txt')
     print('                                 hscode_[chapter]_latest.txt')
     print('  --no-latest                   不生成(或覆盖原有的)latest文件')
+    print('  --quiet|-q                    静默模式，不打印日志信息')
     print('  --outdated                    包含[过期]数据')
     print('  --proxy|-p [proxy-url]        请求代理')
     print('                                 --proxy https://www.baidu.com?s={url}')
