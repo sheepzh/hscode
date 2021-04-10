@@ -32,6 +32,7 @@ print(code)
 ```python
 code = get_code_info('2302500000')
 print(code)
+# None
 ```
 查询 [2302500000](https://hsbianma.com/Code/2302500000.html) 成功时返回的海关编码信息。
 ```json
