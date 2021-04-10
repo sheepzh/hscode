@@ -7,7 +7,7 @@ from setuptools import setup
 
 setup(
     name='code',
-    version='1.2',
+    version='1.2.1',
     author='zhy',
     author_email='returnzhy1996@outlook.com',
     url='https://github.com/sheepzh/hscode',
