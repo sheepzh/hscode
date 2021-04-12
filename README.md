@@ -108,7 +108,7 @@ python3 main.py --help
                                                     {url} 是原始请求 url
 ```
 
-3. 示例：爬取 [第 97 章](https://hsbianma.com/search?keywords=97) 的海关编码
+3. 示例：爬取 [第 97 章 - 艺术品、收藏品及古物](https://hsbianma.com/search?keywords=97) 的海关编码
 
 ```shell
 python3 main.py -s 97 --outdated
